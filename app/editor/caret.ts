@@ -42,3 +42,43 @@ export function saveCursorPosition(element: HTMLElement) {
 
   return preSelectionRange.toString().length;
 }
+
+export function setCursorPosition(
+  element: HTMLElement,
+  position: "start" | "end",
+) {
+  const range = document.createRange();
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  if (position === "end") {
+    range.selectNodeContents(element);
+    range.collapse(false);
+  } else {
+    range.setStart(element, 0);
+    range.collapse(true);
+  }
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+export function getTextAroundCursor(element: HTMLElement) {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return { left: "", right: "" };
+  }
+  const range = selection.getRangeAt(0);
+
+  const rangeToStart = document.createRange();
+  rangeToStart.setStart(element, 0);
+  rangeToStart.setEnd(range.startContainer, range.startOffset);
+
+  const rangeToEnd = document.createRange();
+  rangeToEnd.setStart(range.startContainer, range.startOffset);
+  rangeToEnd.setEnd(element, element.childNodes.length);
+
+  return {
+    left: rangeToStart.toString(),
+    right: rangeToEnd.toString(),
+  };
+}

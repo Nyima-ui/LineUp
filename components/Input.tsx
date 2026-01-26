@@ -1,8 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { restoreCursorPosition, saveCursorPosition } from "@/app/editor/caret";
 import { formatText, detectOpenBracket } from "@/app/editor/formatting";
 import { Line } from "./types";
+import {
+  restoreCursorPosition,
+  saveCursorPosition,
+  setCursorPosition,
+  getTextAroundCursor,
+} from "@/app/editor/caret";
 
 interface InputProps {
   lines: Line[];
@@ -60,22 +65,6 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
     }
   }
 
-  function setCursorPosition(element: HTMLElement, position: "start" | "end") {
-    const range = document.createRange();
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    if (position === "end") {
-      range.selectNodeContents(element);
-      range.collapse(false);
-    } else {
-      range.setStart(element, 0);
-      range.collapse(true);
-    }
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-
   function moveCursorToEnd(lineId: string) {
     const span = lineRefs.current.get(lineId);
     if (span) setCursorPosition(span, "end");
@@ -92,27 +81,6 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
       targetSpan.focus();
       moveCursorToEnd(targetLineId);
     });
-  }
-
-  function getTextAroundCursor(element: HTMLElement) {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      return { left: "", right: "" };
-    }
-    const range = selection.getRangeAt(0);
-
-    const rangeToStart = document.createRange();
-    rangeToStart.setStart(element, 0);
-    rangeToStart.setEnd(range.startContainer, range.startOffset);
-
-    const rangeToEnd = document.createRange();
-    rangeToEnd.setStart(range.startContainer, range.startOffset);
-    rangeToEnd.setEnd(element, element.childNodes.length);
-
-    return {
-      left: rangeToStart.toString(),
-      right: rangeToEnd.toString(),
-    };
   }
 
   function createNewLine(id: string, index: number, text: string = "") {
@@ -159,31 +127,54 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
   }
 
   function handleBackspace(id: string) {
-    const index = lines.findIndex((line) => line.id === id);
-    if (index <= 0 || lines.length <= 1) return;
-    const previousLineId = lines[index - 1].id;
+    const element = lineRefs.current.get(id);
+    if (!element) return;
 
-    setLines((prev) => prev.filter((line) => line.id !== id));
-    setFocusId(previousLineId);
+    const index = lines.findIndex((line) => line.id === id);
+    if (index <= 0) return;
+
+    const cursorPosition = saveCursorPosition(element);
+    if (cursorPosition !== 0) return;
+
+    const currentText = lines[index].text;
+    const previousLine = lines[index - 1];
+    const previousElement = lineRefs.current.get(previousLine.id);
+    if (!previousElement) return;
+
+    const newCursorPosition = previousLine.text.length;
+    const mergedText = previousLine.text + currentText;
+
+    setLines((prev) =>
+      prev
+        .map((l) => (l.id === previousLine.id ? { ...l, text: mergedText } : l))
+        .filter((l) => l.id !== id),
+    );
 
     setTimeout(() => {
-      moveCursorToEnd(previousLineId);
+      previousElement.innerHTML = formatText(mergedText);
+      previousElement.focus();
+      restoreCursorPosition(previousElement, newCursorPosition);
     }, 0);
   }
 
   function handleKeyDown(id: string, e: React.KeyboardEvent<HTMLSpanElement>) {
     const currentIndex = lines.findIndex((l) => l.id === id);
-    const currentText = lines[currentIndex]?.text || "";
 
     if (e.key === "Enter") {
       e.preventDefault();
       handleEnter(id);
       return;
     }
-    if (e.key === "Backspace" && currentText === "" && currentIndex > 0) {
-      e.preventDefault();
-      handleBackspace(id);
-      return;
+    if (e.key === "Backspace") {
+      const element = lineRefs.current.get(id);
+      const cursorPosition = element ? saveCursorPosition(element) : null;
+
+      if (cursorPosition === 0 && currentIndex > 0) {
+        console.log("trigger");
+        e.preventDefault();
+        handleBackspace(id);
+        return;
+      }
     }
     if (e.key === "ArrowUp" && currentIndex > 0) {
       e.preventDefault();

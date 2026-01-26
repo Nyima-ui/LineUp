@@ -30,14 +30,3 @@ export function detectOpenBracket(previousText: string, currentText: string) {
     !prevNormalized.endsWith("[")
   );
 }
-
-export function formatHeading(text: string): string {
-  const match = text.match(/(\#)(.*)$/);
-  if (!match) return text;
-  let html = "";
-  const [heading] = match;
-  if (heading) {
-    html += `<span>${heading}</span>`;
-  }
-  return html || text;
-}
