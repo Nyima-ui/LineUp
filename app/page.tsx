@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Line } from "./types";
 import dynamic from "next/dynamic";
 
-const Input = dynamic(() => import("@/components/Input"), { ssr: false });
+// const Input = dynamic(() => import("@/components/Input"), { ssr: false });
+const Input = dynamic(() => import("@/components/play"), { ssr: false });
 
 let lineId = 0;
 const generateId = () => `line-${lineId++}`;

@@ -60,25 +60,18 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
     }
   }
 
-  function setCursorPosition(element: HTMLElement, position: "start" | "end") {
+  function moveCursorToEnd(lineId: string) {
+    const span = lineRefs.current.get(lineId);
+    if (!span) return;
+
     const range = document.createRange();
     const selection = window.getSelection();
     if (!selection) return;
 
-    if (position === "end") {
-      range.selectNodeContents(element);
-      range.collapse(false);
-    } else {
-      range.setStart(element, 0);
-      range.collapse(true);
-    }
-    selection.removeAllRanges();
+    range.selectNodeContents(span);
+    range.collapse(false);
+    selection?.removeAllRanges();
     selection.addRange(range);
-  }
-
-  function moveCursorToEnd(lineId: string) {
-    const span = lineRefs.current.get(lineId);
-    if (span) setCursorPosition(span, "end");
   }
 
   function navigateToLine(targetIndex: number) {
@@ -94,68 +87,95 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
     });
   }
 
-  function getTextAroundCursor(element: HTMLElement) {
+  function getTextOnLeft(element: HTMLSpanElement) {
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      return { left: "", right: "" };
-    }
+    if (!selection || selection.rangeCount === 0)
+      return element.textContent || "";
+
     const range = selection.getRangeAt(0);
+    const rangeFromStart = document.createRange();
+    rangeFromStart.setStart(element, 0);
+    rangeFromStart.setEnd(range.startContainer, range.startOffset);
 
-    const rangeToStart = document.createRange();
-    rangeToStart.setStart(element, 0);
-    rangeToStart.setEnd(range.startContainer, range.startOffset);
+    return rangeFromStart.toString();
+  }
 
+  function getTextOnRight(element: HTMLSpanElement) {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return "";
+
+    const range = selection.getRangeAt(0);
+    console.log(range);
     const rangeToEnd = document.createRange();
     rangeToEnd.setStart(range.startContainer, range.startOffset);
     rangeToEnd.setEnd(element, element.childNodes.length);
-
-    return {
-      left: rangeToStart.toString(),
-      right: rangeToEnd.toString(),
-    };
+    console.log(rangeToEnd.toString());
+    return rangeToEnd.toString();
   }
 
-  function createNewLine(id: string, index: number, text: string = "") {
+  function handleEnterWhenTextOnRight(id: string, textOnRight: string) {
+    const currentElement = lineRefs.current.get(id);
+    if (!currentElement) return;
+
+    const textOnLeft = getTextOnLeft(currentElement);
     const newLineId = generateId();
 
-    setLines((prev) => {
-      const next = [...prev];
-      const newLine = { id: newLineId, text };
+    setLines((lines) => {
+      const index = lines.findIndex((l) => l.id === id);
+      const next = [...lines];
+      next[index] = { ...next[index], text: textOnLeft };
+      const newLine = { id: newLineId, text: textOnRight };
       next.splice(index + 1, 0, newLine);
       return next;
     });
-    return newLineId;
+
+    currentElement.innerHTML = formatText(textOnLeft);
+
+    setTimeout(() => {
+      const newElement = lineRefs.current.get(newLineId);
+      if (newElement) {
+        newElement.innerHTML = formatText(textOnRight);
+        newElement.focus();
+
+        const range = document.createRange();
+        const selection = window.getSelection();
+        range.setStart(newElement, 0);
+        range.collapse(true);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+    }, 0);
   }
 
-  function handleEnter(id: string) {
+  function detectTextOnRight(id: string) {
     const element = lineRefs.current.get(id);
-    if (!element) return;
+    if (!element) return false;
 
     const cursorPosition = saveCursorPosition(element);
     const totalTextLength = element.textContent?.length || 0;
-    const index = lines.findIndex((line) => line.id === id);
 
-    if (cursorPosition !== null && cursorPosition < totalTextLength) {
-      const { left, right } = getTextAroundCursor(element);
-
-      setLines((prev) =>
-        prev.map((line) => (line.id === id ? { ...line, text: left } : line)),
-      );
-      element.innerHTML = formatText(left);
-
-      const newLineId = createNewLine(id, index, right);
-      setTimeout(() => {
-        const newElement = lineRefs.current.get(newLineId);
-        if (newElement) {
-          newElement.innerHTML = formatText(right);
-          newElement.focus();
-          setCursorPosition(newElement, "start");
-        }
-      }, 0);
-    } else {
-      const newLineId = createNewLine(id, index);
-      setFocusId(newLineId);
+    if (cursorPosition === null || cursorPosition >= totalTextLength)
+      return false;
+    else {
+      const textOnRight = getTextOnRight(element);
+      handleEnterWhenTextOnRight(id, textOnRight);
+      return true;
     }
+  }
+
+  function handleEnter(id: string) {
+    const newLineId = generateId();
+    const isThereTextOnRight = detectTextOnRight(id);
+    console.log(isThereTextOnRight);
+    if (isThereTextOnRight) return;
+    setLines((prev) => {
+      const index = prev.findIndex((line) => line.id === id);
+      const next = [...prev];
+      const newLine = { id: newLineId, text: "" };
+      next.splice(index + 1, 0, newLine);
+      return next;
+    });
+    setFocusId(newLineId);
   }
 
   function handleBackspace(id: string) {
