@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { Line } from "./types";
 import dynamic from "next/dynamic";
 
-// const Input = dynamic(() => import("@/components/Input"), { ssr: false });
-const Input = dynamic(() => import("@/components/play"), { ssr: false });
+const Input = dynamic(() => import("@/components/Input"), { ssr: false });
 
 let lineId = 0;
 const generateId = () => `line-${lineId++}`;
@@ -25,7 +24,7 @@ export default function Home() {
   }, [lines]);
 
   useEffect(() => {
-    console.log(lines);
+    // console.log(lines);
   }, [lines]);
   return (
     <div className="text-white bg-background min-h-screen">

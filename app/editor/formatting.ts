@@ -1,4 +1,7 @@
 export function formatText(text: string): string {
+  if (/^#+/.test(text)) {
+    return `<span class="text-heading font-semibold">${text}</span>`;
+  }
   const match = text.match(/^(\d+\.\s+)?(\[([^\]]*)\])?(.*)$/);
   if (!match) return text;
 
@@ -18,9 +21,23 @@ export function formatText(text: string): string {
 }
 
 export function detectOpenBracket(previousText: string, currentText: string) {
+  const prevNormalized = previousText.replace(/[\u00A0\s]/g, " ");
+  const currNormalized = currentText.replace(/[\u00A0\s]/g, " ");
+
   return (
-    currentText.length === previousText.length + 1 &&
-    currentText.endsWith("[") &&
-    !previousText.endsWith("[")
+    currNormalized.length === prevNormalized.length + 1 &&
+    currNormalized.endsWith("[") &&
+    !prevNormalized.endsWith("[")
   );
+}
+
+export function formatHeading(text: string): string {
+  const match = text.match(/(\#)(.*)$/);
+  if (!match) return text;
+  let html = "";
+  const [heading] = match;
+  if (heading) {
+    html += `<span>${heading}</span>`;
+  }
+  return html || text;
 }

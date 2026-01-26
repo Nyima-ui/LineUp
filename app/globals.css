@@ -7,4 +7,5 @@
 @theme {
   --color-background: var(--background);
   --color-editor-list-marker: var(--editor-syntax-list-marker);
+  --color-heading: var(--editor-syntax-list-marker);
 }
