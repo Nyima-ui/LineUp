@@ -15,6 +15,19 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
   const lineRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
   const [focusId, setFocusId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!initializedRef.current && lines.length > 0) {
+      lines.forEach((line) => {
+        const element = lineRefs.current.get(line.id);
+        if (element && line.text) {
+          element.innerHTML = formatText(line.text);
+        }
+      });
+      initializedRef.current = true;
+    }
+  }, [lines]);
 
   function autoCloseBracket(id: string, text: string) {
     const element = lineRefs.current.get(id);

@@ -23,7 +23,7 @@ export function restoreCursorPosition(element: HTMLElement, position: number) {
 
       offset += textLength;
     } else {
-      // Push children in reverse becuase of LIFO
+      // Push children in reverse because we are using .pop()
       for (let i = node.childNodes.length - 1; i >= 0; i--) {
         stack.push(node.childNodes[i]);
       }
