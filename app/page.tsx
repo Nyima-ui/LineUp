@@ -3,6 +3,7 @@ import LineNumbers from "@/components/LineNumbers";
 import { useEffect, useState } from "react";
 import { Line } from "./types";
 import dynamic from "next/dynamic";
+import SideBar from "@/components/SideBar";
 
 const Input = dynamic(() => import("@/components/Input"), { ssr: false });
 
@@ -27,8 +28,10 @@ export default function Home() {
     // console.log(lines);
   }, [lines]);
   return (
-    <div className="text-white bg-background min-h-screen">
-      <div className="flex text-[14px] leading-4.75">
+    <div className="text-foreground bg-background flex bg-main">
+      <SideBar />
+
+      <div className="flex text-sm leading-4.75 flex-1 bg-editor">
         <LineNumbers lines={lines} activeLine={activeLine} />
         <Input
           lines={lines}

@@ -1,11 +1,23 @@
 @import "tailwindcss";
 
+
 :root {
-  --background: #1e1e1e;
-  --editor-syntax-list-marker: #569cd6;
+  --bg-main: #181818;
+  --bg-editor: #212121;
+  --bg-file-opened: #242424;
+  --bg-file-hover: #303030;
+  --bg-outline: #22a6f1;
+
+  --foreground: #ffffff;
+  --bg-outline-line: #d9d9d9;
 }
 @theme {
-  --color-background: var(--background);
-  --color-editor-list-marker: var(--editor-syntax-list-marker);
-  --color-heading: var(--editor-syntax-list-marker);
+  --color-main: var(--bg-main);
+  --color-editor: var(--bg-editor);
+  --color-file-opened: var(--bg-file-opened);
+  --color-file-hover: var(--bg-file-hover);
+  --color-outline: var(--bg-outline);
+
+  --color-foreground: var(--foreground);
+  --color-outline-line: var(--color-outline-line);
 }

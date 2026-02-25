@@ -6,7 +6,7 @@ interface LineNumbersProps {
 }
 const LineNumbers = ({ lines, activeLine }: LineNumbersProps) => {
   return (
-    <div className="w-15 min-h-screen flex flex-col">
+    <div className="w-12 flex flex-col">
       {lines.map((_, idx) => (
         <div key={idx}>
           <span
