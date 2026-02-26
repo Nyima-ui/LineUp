@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Line } from "./types";
 import dynamic from "next/dynamic";
 import SideBar from "@/components/SideBar";
+import MonacoEditor from "@/components/Editor";
 
 const Input = dynamic(() => import("@/components/Input"), { ssr: false });
 
@@ -32,13 +33,14 @@ export default function Home() {
       <SideBar />
 
       <div className="flex text-sm leading-4.75 flex-1 bg-editor">
-        <LineNumbers lines={lines} activeLine={activeLine} />
+        {/* <LineNumbers lines={lines} activeLine={activeLine} />
         <Input
           lines={lines}
           setLines={setLines}
           generateId={generateId}
           setActiveLine={setActiveLine}
-        />
+        /> */}
+        <MonacoEditor />
       </div>
     </div>
   );

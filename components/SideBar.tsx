@@ -96,9 +96,7 @@ function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
       return;
     }
     localStorage.setItem("Files", JSON.stringify([...files, fileName.trim()]));
-
     addFile((files) => [...files, fileName.trim()]);
-
     setIsTyping(false);
   }
 
@@ -121,20 +119,13 @@ function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
   }
 
   useEffect(() => {
-    const toggleFileExists = (val: boolean) => setFileAlreadyExists(val);
-    if (fileAlreadyExists) {
-      toggleFileExists(false);
-    }
-  }, [fileName]);
-
-  useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
   useEffect(() => {
     // console.log(fileName);
   }, [fileName]);
-  //escape, enter, on blur
+
   return (
     <div className="flex pl-[18px] mt-[5px] gap-[5px]">
       <div className="shrink-0">
@@ -145,7 +136,10 @@ function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
           type="text"
           value={fileName}
           onBlur={handleBlur}
-          onChange={(e) => setFileName(e.currentTarget.value)}
+          onChange={(e) => {
+            setFileName(e.currentTarget.value);
+            if (fileAlreadyExists) setFileAlreadyExists(false);
+          }}
           className="rounded-none text-sm outline-none focus:ring-1 focus:ring-outline"
           ref={inputRef}
           onKeyDown={(e) => handleKeyDown(e)}

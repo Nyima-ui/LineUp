@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+.bracket-orange {
+  color: #ce9178 !important;
+}
 
 :root {
   --bg-main: #181818;

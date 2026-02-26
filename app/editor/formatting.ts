@@ -1,6 +1,6 @@
 export function formatText(text: string): string {
   if (/^#+/.test(text)) {
-    return `<span class="text-heading font-semibold">${text}</span>`;
+    return `<span class="text-outline font-semibold">${text}</span>`;
   }
   const match = text.match(/^(\d+\.\s+)?(\[([^\]]*)\])?(.*)$/);
   if (!match) return text;
