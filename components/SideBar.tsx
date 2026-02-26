@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import File from "./File";
 import ChevronRight from "./svgs/ChevronRight";
@@ -13,6 +13,17 @@ const DUMMY_FILENAMEs = [
 ];
 
 const SideBar = () => {
+  //improve name later
+  const [isTypingFileName, setisTypingFileName] = useState(false);
+  const [files, setFiles] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadFiles = (files: string[]) => setFiles(files);
+    const filesFromDB = localStorage.getItem("Files");
+    if (!filesFromDB) return;
+    loadFiles(JSON.parse(filesFromDB));
+  }, []);
+
   return (
     <div className="w-[242px] pt-[20px] pr-[13px] pl-[10px]">
       {/* header  */}
@@ -23,17 +34,31 @@ const SideBar = () => {
             Your lists
           </p>
         </div>
-        <button className="cursor-pointer hover:bg-file-hover p-1 rounded-sm">
+        <button
+          className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+          onClick={() => setisTypingFileName(true)}
+        >
           <NoteAdd />
         </button>
       </div>
 
       <div className="mt-5">
-        {DUMMY_FILENAMEs.map((name, idx) => (
+        {files.map((name, idx) => (
           <File key={idx} name={name} />
         ))}
       </div>
-      <GetFileName />
+      {isTypingFileName && (
+        <FileNameInput
+          isTyping={isTypingFileName}
+          setIsTyping={setisTypingFileName}
+          addFile={setFiles}
+        />
+      )}
+      {/* <FileNameInput
+        isTyping={isTypingFileName}
+        setIsTyping={setisTypingFileName}
+        addFile={setFiles}
+      /> */}
     </div>
   );
 };
@@ -44,20 +69,95 @@ export default SideBar;
 //work on the name Claude
 
 import InsertDriveFile from "./svgs/InsertDriveFile";
-import { useState } from "react";
-function GetFileName() {
- const [fileName, setFileName] = useState("")
+import { useEffect, useRef, useState } from "react";
+
+export interface FileNameInputProps {
+  isTyping: boolean;
+  setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
+  addFile: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
+  const [fileName, setFileName] = useState("");
+  const [fileAlreadyExists, setFileAlreadyExists] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleSave() {
+    if (!fileName.trim()) {
+      setIsTyping(false);
+      return;
+    }
+
+    const existingFiles = localStorage.getItem("Files");
+    const files = existingFiles ? JSON.parse(existingFiles) : [];
+
+    if (files.includes(fileName.trim())) {
+      setFileAlreadyExists(true);
+      return;
+    }
+    localStorage.setItem("Files", JSON.stringify([...files, fileName.trim()]));
+
+    addFile((files) => [...files, fileName.trim()]);
+
+    setIsTyping(false);
+  }
+
+  function handleBlur() {
+    if (fileAlreadyExists) {
+      setFileName("");
+      setIsTyping(false);
+      setFileAlreadyExists(false);
+    } else {
+      handleSave();
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") handleSave();
+    else if (e.key === "Escape") {
+      setFileName("");
+      setIsTyping(false);
+    }
+  }
+
+  useEffect(() => {
+    const toggleFileExists = (val: boolean) => setFileAlreadyExists(val);
+    if (fileAlreadyExists) {
+      toggleFileExists(false);
+    }
+  }, [fileName]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    // console.log(fileName);
+  }, [fileName]);
+  //escape, enter, on blur
   return (
     <div className="flex pl-[18px] mt-[5px] gap-[5px]">
       <div className="shrink-0">
         <InsertDriveFile />
       </div>
-      <input
-        type="text"
-        value={fileName}
-        onChange={(e) => setFileName(e.currentTarget.value)}
-        className="rounded-none text-sm outline-none focus:ring-1 focus:ring-outline"
-      />
+      <div className="relative">
+        <input
+          type="text"
+          value={fileName}
+          onBlur={handleBlur}
+          onChange={(e) => setFileName(e.currentTarget.value)}
+          className="rounded-none text-sm outline-none focus:ring-1 focus:ring-outline"
+          ref={inputRef}
+          onKeyDown={(e) => handleKeyDown(e)}
+        />
+        {fileAlreadyExists && (
+          <div className="absolute top-full text-xs leading-snug bg-red-600 border border-red-700 translate-y w-full p-0.5 rounded-xs">
+            <span>
+              File already exists. Please choose a different file name.
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export default function Home() {
     // console.log(lines);
   }, [lines]);
   return (
-    <div className="text-foreground bg-background flex bg-main">
+    <div className="text-foreground bg-background flex bg-main min-h-screen">
       <SideBar />
 
       <div className="flex text-sm leading-4.75 flex-1 bg-editor">
