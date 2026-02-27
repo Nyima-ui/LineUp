@@ -1,6 +1,6 @@
 "use client";
 import { Editor } from "@monaco-editor/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type * as MonacoType from "monaco-editor";
 
 declare global {
@@ -94,6 +94,11 @@ const MonacoEditor = ({ value, onChange, disabled }: MonacoEditorProps) => {
     applyBracketDecorations(editor, monaco, value);
   }
 
+  useEffect(() => {
+    if (editorRef.current && window.__monaco) {
+      applyBracketDecorations(editorRef.current, window.__monaco, value);
+    }
+  }, [value]);
   return (
     <div style={{ width: "100%", height: "100%" }}>
       <Editor

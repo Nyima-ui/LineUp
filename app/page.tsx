@@ -39,6 +39,18 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  function handleRename(oldName: string, newName: string) {
+    setFiles((prev) => {
+      const updated: FileStore = {};
+      for (const [key, value] of Object.entries(prev)) {
+        updated[key === oldName ? newName : key] = value;
+      }
+      saveFiles(updated);
+      return updated;
+    });
+    if (activeFile === oldName) setActiveFile(newName);
+  }
+
   if (!mounted) return null;
 
   return (
@@ -48,6 +60,7 @@ export default function Home() {
         activeFile={activeFile}
         onFileSelect={handleFileSelect}
         onFileCreate={handleFileCreate}
+        onRename={handleRename}
       />
 
       <div className="flex text-sm leading-4.75 flex-1 bg-editor min-w-0">

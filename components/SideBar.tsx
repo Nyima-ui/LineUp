@@ -10,6 +10,7 @@ interface SideBarProps {
   activeFile: string | null;
   onFileSelect: (name: string) => void;
   onFileCreate: (name: string) => void;
+  onRename: (oldName: string, newName: string) => void;
 }
 
 const SideBar = ({
@@ -17,8 +18,8 @@ const SideBar = ({
   activeFile,
   onFileSelect,
   onFileCreate,
+  onRename
 }: SideBarProps) => {
-  //improve name later
   const [isTypingFileName, setisTypingFileName] = useState(false);
 
   return (
@@ -46,6 +47,7 @@ const SideBar = ({
             name={name}
             onFileSelect={onFileSelect}
             activeFile={activeFile}
+            onRename={onRename}
           />
         ))}
       </div>
