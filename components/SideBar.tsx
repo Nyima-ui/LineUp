@@ -3,26 +3,23 @@
 import File from "./File";
 import ChevronRight from "./svgs/ChevronRight";
 import NoteAdd from "./svgs/NoteAdd";
+import { loadFiles } from "@/lib/storage";
 
-const DUMMY_FILENAMEs = [
-  "Todo_list",
-  "Read_list",
-  "Buy_lists",
-  "Things to buy in Delhi",
-  "extremely long file name list, it's so long that",
-];
+interface SideBarProps {
+  files: string[];
+  activeFile: string | null;
+  onFileSelect: (name: string) => void;
+  onFileCreate: (name: string) => void;
+}
 
-const SideBar = () => {
+const SideBar = ({
+  files,
+  activeFile,
+  onFileSelect,
+  onFileCreate,
+}: SideBarProps) => {
   //improve name later
   const [isTypingFileName, setisTypingFileName] = useState(false);
-  const [files, setFiles] = useState<string[]>([]);
-
-  useEffect(() => {
-    const loadFiles = (files: string[]) => setFiles(files);
-    const filesFromDB = localStorage.getItem("Files");
-    if (!filesFromDB) return;
-    loadFiles(JSON.parse(filesFromDB));
-  }, []);
 
   return (
     <div className="w-[242px] pt-[20px] pr-[13px] pl-[10px]">
@@ -44,21 +41,21 @@ const SideBar = () => {
 
       <div className="mt-5">
         {files.map((name, idx) => (
-          <File key={idx} name={name} />
+          <File
+            key={idx}
+            name={name}
+            onFileSelect={onFileSelect}
+            activeFile={activeFile}
+          />
         ))}
       </div>
       {isTypingFileName && (
         <FileNameInput
           isTyping={isTypingFileName}
           setIsTyping={setisTypingFileName}
-          addFile={setFiles}
+          createFile={onFileCreate}
         />
       )}
-      {/* <FileNameInput
-        isTyping={isTypingFileName}
-        setIsTyping={setisTypingFileName}
-        addFile={setFiles}
-      /> */}
     </div>
   );
 };
@@ -74,10 +71,14 @@ import { useEffect, useRef, useState } from "react";
 export interface FileNameInputProps {
   isTyping: boolean;
   setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
-  addFile: React.Dispatch<React.SetStateAction<string[]>>;
+  createFile: (value: string) => void;
 }
 
-function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
+function FileNameInput({
+  isTyping,
+  setIsTyping,
+  createFile,
+}: FileNameInputProps) {
   const [fileName, setFileName] = useState("");
   const [fileAlreadyExists, setFileAlreadyExists] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -88,15 +89,14 @@ function FileNameInput({ isTyping, setIsTyping, addFile }: FileNameInputProps) {
       return;
     }
 
-    const existingFiles = localStorage.getItem("Files");
-    const files = existingFiles ? JSON.parse(existingFiles) : [];
+    const files = loadFiles();
+    const existingFiles = Object.keys(files);
 
-    if (files.includes(fileName.trim())) {
+    if (existingFiles.includes(fileName.trim())) {
       setFileAlreadyExists(true);
       return;
     }
-    localStorage.setItem("Files", JSON.stringify([...files, fileName.trim()]));
-    addFile((files) => [...files, fileName.trim()]);
+    createFile(fileName.trim());
     setIsTyping(false);
   }
 

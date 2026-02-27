@@ -1,46 +1,61 @@
 "use client";
-import LineNumbers from "@/components/LineNumbers";
 import { useEffect, useState } from "react";
-import { Line } from "./types";
-import dynamic from "next/dynamic";
 import SideBar from "@/components/SideBar";
 import MonacoEditor from "@/components/Editor";
-
-const Input = dynamic(() => import("@/components/Input"), { ssr: false });
-
-let lineId = 0;
-const generateId = () => `line-${lineId++}`;
+import { type FileStore, loadFiles, saveFiles } from "@/lib/storage";
 
 export default function Home() {
-  const [lines, setLines] = useState<Line[]>([{ id: generateId(), text: "" }]);
-  const [activeLine, setActiveLine] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
+  const [files, setFiles] = useState<FileStore>({});
+  const [activeFile, setActiveFile] = useState<string | null>(null);
+
+  function handleFileSelect(name: string) {
+    setActiveFile(name);
+  }
+
+  function handleFileCreate(name: string) {
+    setFiles((prev) => {
+      const updated = { ...prev, [name]: "" };
+      saveFiles(updated);
+      return updated;
+    });
+    setActiveFile(name);
+  }
+
+  function handleMarkDownChange(value: string) {
+    if (!activeFile) return;
+    setFiles((prev) => {
+      const updated = { ...prev, [activeFile]: value };
+      saveFiles(updated);
+      return updated;
+    });
+  }
 
   useEffect(() => {
-    const fetchLines = (items: Line[]) => setLines(items);
-    const items = localStorage.getItem("items");
-    if (items) fetchLines(JSON.parse(items));
+    const loaded = loadFiles();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFiles(loaded);
+    setActiveFile(Object.keys(loaded)[0] ?? null);
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("items", JSON.stringify(lines));
-  }, [lines]);
+  if (!mounted) return null;
 
-  useEffect(() => {
-    // console.log(lines);
-  }, [lines]);
   return (
-    <div className="text-foreground bg-background flex bg-main min-h-screen">
-      <SideBar />
+    <div className="text-foreground bg-background flex bg-main h-screen overflow-hidden">
+      <SideBar
+        files={Object.keys(files)}
+        activeFile={activeFile}
+        onFileSelect={handleFileSelect}
+        onFileCreate={handleFileCreate}
+      />
 
-      <div className="flex text-sm leading-4.75 flex-1 bg-editor">
-        {/* <LineNumbers lines={lines} activeLine={activeLine} />
-        <Input
-          lines={lines}
-          setLines={setLines}
-          generateId={generateId}
-          setActiveLine={setActiveLine}
-        /> */}
-        <MonacoEditor />
+      <div className="flex text-sm leading-4.75 flex-1 bg-editor min-w-0">
+        <MonacoEditor
+          value={activeFile ? files[activeFile] : ""}
+          onChange={handleMarkDownChange}
+          disabled={!activeFile}
+        />
       </div>
     </div>
   );

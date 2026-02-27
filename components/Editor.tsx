@@ -1,6 +1,6 @@
 "use client";
 import { Editor } from "@monaco-editor/react";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import type * as MonacoType from "monaco-editor";
 
 declare global {
@@ -9,8 +9,13 @@ declare global {
   }
 }
 
-const MonacoEditor = () => {
-  const [markdown, setMarkdown] = useState("# Write your lists here 📃");
+interface MonacoEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled: boolean;
+}
+
+const MonacoEditor = ({ value, onChange, disabled }: MonacoEditorProps) => {
   const editorRef = useRef<MonacoType.editor.IStandaloneCodeEditor | null>(
     null,
   );
@@ -55,7 +60,7 @@ const MonacoEditor = () => {
 
   function handleEditorChange(value: string | undefined) {
     const newValue = value || "";
-    setMarkdown(newValue);
+    onChange(newValue);
 
     if (editorRef.current) {
       // Access monaco from the global scope set during mount
@@ -86,23 +91,27 @@ const MonacoEditor = () => {
     monaco.editor.setTheme("my-markdown-theme");
 
     // Apply on initial value
-    applyBracketDecorations(editor, monaco, markdown);
+    applyBracketDecorations(editor, monaco, value);
   }
+
   return (
-    <Editor
-      height="100vh"
-      defaultLanguage="markdown"
-      value={markdown}
-      theme="my-markdown-theme"
-      onMount={handleEditorDidMount}
-      onChange={handleEditorChange}
-      options={{
-        minimap: { enabled: false },
-        fontSize: 14,
-        wordWrap: "on",
-        folding: false,
-      }}
-    />
+    <div style={{ width: "100%", height: "100%" }}>
+      <Editor
+        height="100%"
+        width="100%"
+        defaultLanguage="markdown"
+        value={value}
+        theme="my-markdown-theme"
+        onMount={handleEditorDidMount}
+        onChange={handleEditorChange}
+        options={{
+          minimap: { enabled: false },
+          fontSize: 14,
+          wordWrap: "on",
+          folding: false,
+        }}
+      />
+    </div>
   );
 };
 
