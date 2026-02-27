@@ -3,14 +3,24 @@ import { useEffect, useState } from "react";
 import SideBar from "@/components/SideBar";
 import MonacoEditor from "@/components/Editor";
 import { type FileStore, loadFiles, saveFiles } from "@/lib/storage";
+import Tabs from "@/components/Tabs";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [files, setFiles] = useState<FileStore>({});
   const [activeFile, setActiveFile] = useState<string | null>(null);
+  const [activeTabs, setActiveTabs] = useState<string[]>([]);
 
   function handleFileSelect(name: string) {
     setActiveFile(name);
+    setActiveTabs((prev) => {
+      if (prev.includes(name)) return prev;
+      return [...prev, name];
+    });
+  }
+
+  function handleCloseTab(name: string) {
+    setActiveTabs((prev) => prev.filter((t) => t !== name));
   }
 
   function handleFileCreate(name: string) {
@@ -63,7 +73,13 @@ export default function Home() {
         onRename={handleRename}
       />
 
-      <div className="flex text-sm leading-4.75 flex-1 bg-editor min-w-0">
+      <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0">
+        <Tabs
+          activeTabs={activeTabs}
+          activeFile={activeFile}
+          onClose={handleCloseTab}
+          onSelect={setActiveFile}
+        />
         <MonacoEditor
           value={activeFile ? files[activeFile] : ""}
           onChange={handleMarkDownChange}
