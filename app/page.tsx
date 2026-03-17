@@ -10,9 +10,11 @@ export default function Home() {
   const [files, setFiles] = useState<FileStore>({});
   const [activeFile, setActiveFile] = useState<string | null>(null);
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
+  const [tabHistory, setTabHistory] = useState<string[]>([]);
 
   function handleFileSelect(name: string) {
     setActiveFile(name);
+    setTabHistory((prev) => [...prev.filter((t) => t !== name), name]);
     setActiveTabs((prev) => {
       if (prev.includes(name)) return prev;
       return [...prev, name];
@@ -21,6 +23,12 @@ export default function Home() {
 
   function handleCloseTab(name: string) {
     setActiveTabs((prev) => prev.filter((t) => t !== name));
+    setTabHistory((prev) => prev.filter((t) => t !== name));
+
+    if (activeFile === name) {
+      const history = tabHistory.filter((t) => t !== name);
+      setActiveFile(history.at(-1) ?? null);
+    }
   }
 
   function handleFileCreate(name: string) {
@@ -30,6 +38,7 @@ export default function Home() {
       return updated;
     });
     setActiveFile(name);
+    setActiveTabs((prev) => [...prev, name]);
   }
 
   function handleMarkDownChange(value: string) {
@@ -46,6 +55,8 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFiles(loaded);
     setActiveFile(Object.keys(loaded)[0] ?? null);
+    setActiveTabs((prev) => [...prev, Object.keys(loaded)[0] ?? null]);
+    setTabHistory([Object.keys(loaded)[0] ?? null]);
     setMounted(true);
   }, []);
 
@@ -60,6 +71,10 @@ export default function Home() {
     });
     if (activeFile === oldName) setActiveFile(newName);
   }
+
+  useEffect(() => {
+    // console.log("tab history", tabHistory);
+  }, [tabHistory]);
 
   if (!mounted) return null;
 
@@ -78,7 +93,7 @@ export default function Home() {
           activeTabs={activeTabs}
           activeFile={activeFile}
           onClose={handleCloseTab}
-          onSelect={setActiveFile}
+          onSelect={handleFileSelect}
         />
         <MonacoEditor
           value={activeFile ? files[activeFile] : ""}
