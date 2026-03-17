@@ -12,6 +12,8 @@ export default function Home() {
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
   const [tabHistory, setTabHistory] = useState<string[]>([]);
 
+  const [isSideBarOpened, setisSideBarOpened] = useState(false);
+
   function handleFileSelect(name: string) {
     setActiveFile(name);
     setTabHistory((prev) => [...prev.filter((t) => t !== name), name]);
@@ -88,7 +90,7 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <div className="text-foreground bg-background flex bg-main h-screen overflow-hidden">
+    <div className="text-foreground bg-background flex bg-main h-screen overflow-hidden relative">
       <SideBar
         files={Object.keys(files)}
         activeFile={activeFile}
@@ -96,10 +98,12 @@ export default function Home() {
         onFileCreate={handleFileCreate}
         onRename={handleRename}
         onDelete={handleDelete}
+        isOpened={isSideBarOpened}
+        onToggle={setisSideBarOpened}
       />
 
       {activeTabs && activeTabs.length > 0 ? (
-        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0">
+        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0 max-lg:ml-[42px]">
           <Tabs
             activeTabs={activeTabs}
             activeFile={activeFile}

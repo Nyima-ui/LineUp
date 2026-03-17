@@ -4,6 +4,7 @@ import File from "./File";
 import ChevronRight from "./svgs/ChevronRight";
 import NoteAdd from "./svgs/NoteAdd";
 import { loadFiles } from "@/lib/storage";
+import Bars from "./svgs/Bars";
 
 interface SideBarProps {
   files: string[];
@@ -12,37 +13,57 @@ interface SideBarProps {
   onFileCreate: (name: string) => void;
   onRename: (oldName: string, newName: string) => void;
   onDelete: (name: string) => void;
+  isOpened: boolean;
+  onToggle: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SideBar = ({
   files,
   activeFile,
+  isOpened,
   onFileSelect,
   onFileCreate,
   onRename,
   onDelete,
+  onToggle,
 }: SideBarProps) => {
   const [isTypingFileName, setisTypingFileName] = useState(false);
 
+  // className="w-[242px] pt-[20px] pr-[13px] pl-[10px]"
   return (
-    <div className="w-[242px] pt-[20px] pr-[13px] pl-[10px]">
+    <div
+      className={`bg-file-opened relative transition-all duration-100 ease-in pt-[20px] pr-[13px] pl-[10px]
+        max-lg:absolute max-lg:h-full z-10
+        ${isOpened ? "w-[242px]" : "w-[42px]"}`}
+    >
       {/* header  */}
       <div className="flex items-center justify-between border-b pb-[5px] border-b-gray-400">
-        <div className="flex items-center gap-0.5">
-          <ChevronRight />
-          <p className="uppercase font-bold text-sm tracking-wider">
-            Your lists
-          </p>
-        </div>
-        <button
-          className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
-          onClick={() => setisTypingFileName(true)}
-        >
-          <NoteAdd />
+        {isOpened && (
+          <div className="flex items-center gap-0.5">
+            <button className="cursor-pointer">
+              <ChevronRight />
+            </button>
+            <p className="uppercase font-bold text-sm tracking-wider">
+              Your lists
+            </p>
+          </div>
+        )}
+        {isOpened && (
+          <button
+            className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+            onClick={() => setisTypingFileName(true)}
+          >
+            <NoteAdd />
+          </button>
+        )}
+        <button className="cursor-pointer" onClick={() => onToggle(!isOpened)}>
+          <Bars />
         </button>
       </div>
 
-      <div className="mt-5">
+      <div
+        className={`mt-5 text-white whitespace-nowrap transition-opacity duration-100 ease-in ${isOpened ? "opacity-100" : "opacity-0"}`}
+      >
         {files.map((name, idx) => (
           <File
             key={idx}

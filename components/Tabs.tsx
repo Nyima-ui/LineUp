@@ -8,9 +8,11 @@ interface TabsProps {
   onSelect: (name: string) => void;
 }
 
+
+// className="flex items-end bg-main border-b-gray-700 border-b h-[59px] py-2"
 const Tabs = ({ activeTabs, activeFile, onClose, onSelect }: TabsProps) => {
   return (
-    <div className="flex items-end bg-main border-b-gray-400 border-b h-[59px] py-2">
+    <div className="flex items-end bg-main border-b-gray-700 border-b h-[59px] py-2">
       {/* tab  */}
       {activeTabs?.map((name, idx) => (
         <div
