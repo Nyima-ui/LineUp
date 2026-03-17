@@ -54,9 +54,10 @@ export default function Home() {
     const loaded = loadFiles();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFiles(loaded);
-    setActiveFile(Object.keys(loaded)[0] ?? null);
-    setActiveTabs((prev) => [...prev, Object.keys(loaded)[0] ?? null]);
-    setTabHistory([Object.keys(loaded)[0] ?? null]);
+    const firstFile = Object.keys(loaded)[0];
+    setActiveFile(firstFile ?? null);
+    setActiveTabs(firstFile ? [firstFile] : []);
+    setTabHistory(firstFile ? [firstFile] : []);
     setMounted(true);
   }, []);
 
@@ -72,9 +73,17 @@ export default function Home() {
     if (activeFile === oldName) setActiveFile(newName);
   }
 
+  function handleDelete(name: string) {
+    const files = loadFiles();
+    delete files[name];
+    saveFiles(files);
+    handleCloseTab(name);
+    setFiles(files);
+  }
+
   useEffect(() => {
-    // console.log("tab history", tabHistory);
-  }, [tabHistory]);
+    console.log("activeTabs", activeTabs);
+  }, [activeTabs]);
 
   if (!mounted) return null;
 
@@ -86,21 +95,28 @@ export default function Home() {
         onFileSelect={handleFileSelect}
         onFileCreate={handleFileCreate}
         onRename={handleRename}
+        onDelete={handleDelete}
       />
 
-      <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0">
-        <Tabs
-          activeTabs={activeTabs}
-          activeFile={activeFile}
-          onClose={handleCloseTab}
-          onSelect={handleFileSelect}
-        />
-        <MonacoEditor
-          value={activeFile ? files[activeFile] : ""}
-          onChange={handleMarkDownChange}
-          disabled={!activeFile}
-        />
-      </div>
+      {activeTabs && activeTabs.length > 0 ? (
+        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0">
+          <Tabs
+            activeTabs={activeTabs}
+            activeFile={activeFile}
+            onClose={handleCloseTab}
+            onSelect={handleFileSelect}
+          />
+          <MonacoEditor
+            value={activeFile ? files[activeFile] : ""}
+            onChange={handleMarkDownChange}
+            disabled={!activeFile}
+          />
+        </div>
+      ) : (
+        <div className="flex-1 bg-editor font-sans flex items-center justify-center">
+          change this later
+        </div>
+      )}
     </div>
   );
 }

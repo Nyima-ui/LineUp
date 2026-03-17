@@ -79,8 +79,8 @@ const MonacoEditor = ({ value, onChange, disabled }: MonacoEditorProps) => {
       base: "vs-dark",
       inherit: true,
       rules: [
-        { token: "string.link.md", foreground: "#FFFFFF" },
-        { token: "delimiter.square.markdown", foreground: "#FFFFFF" },
+        { token: "string.link.md", foreground: "FFFFFF" },
+        { token: "delimiter.square.markdown", foreground: "FFFFFF" },
       ],
       colors: {
         "editor.foreground": "#D4D4D4",

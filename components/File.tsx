@@ -2,15 +2,23 @@
 import InsertDriveFile from "./svgs/InsertDriveFile";
 import { useRef, useState } from "react";
 import { loadFiles } from "@/lib/storage";
+import Trash from "./svgs/Trash";
 
 interface FileProps {
   name: string;
   activeFile: string | null;
   onFileSelect: (name: string) => void;
   onRename: (oldName: string, newName: string) => void;
+  onDelete: (name: string) => void;
 }
 
-const File = ({ name, activeFile, onFileSelect, onRename }: FileProps) => {
+const File = ({
+  name,
+  activeFile,
+  onFileSelect,
+  onRename,
+  onDelete,
+}: FileProps) => {
   const [isRenaming, setIsRenaming] = useState(false);
   const [fileAlreadyExists, setfileAlreadyExists] = useState(false);
   const [newName, setNewName] = useState("");
@@ -84,14 +92,25 @@ const File = ({ name, activeFile, onFileSelect, onRename }: FileProps) => {
         </div>
       ) : (
         <div
-          className={`flex gap-[5px] cursor-pointer mt-[5px] pl-[18px] hover:bg-file-hover ${activeFile === name ? "bg-file-opened" : ""}`}
+          className={`flex justify-between gap-[5px] cursor-pointer mt-[5px] pl-[18px] hover:bg-file-hover group ${activeFile === name ? "bg-file-opened" : ""}`}
           onClick={() => onFileSelect(name)}
           onDoubleClick={() => handleDoubleClick(name)}
         >
-          <div className="shrink-0">
-            <InsertDriveFile />
+          <div className="flex gap-[5px] items-center">
+            <div className="shrink-0">
+              <InsertDriveFile />
+            </div>
+            <span className="text-sm font-medium truncate">{name}</span>
           </div>
-          <span className="text-sm font-medium truncate">{name}</span>
+          <span
+            className="pr-[18px] opacity-0 group-hover:opacity-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(name);
+            }}
+          >
+            <Trash />
+          </span>
         </div>
       )}
     </>
