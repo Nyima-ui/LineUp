@@ -62,14 +62,15 @@ const File = ({
   }
 
   return (
-    <>
+    <li className="list-none">
       {isRenaming ? (
-        <div className="flex pl-[18px] mt-[5px] gap-[5px]">
-          <div className="shrink-0">
+        <div className="flex pl-4.5 mt-1.25 gap-1.25 items-center">
+          <div className="shrink-0" aria-hidden="true">
             <InsertDriveFile />
           </div>
           <div className="relative">
             <input
+              ref={inputRef}
               type="text"
               value={newName}
               onBlur={handleBlur}
@@ -78,12 +79,17 @@ const File = ({
                 if (fileAlreadyExists) setfileAlreadyExists(false);
               }}
               className="rounded-none text-sm outline-none focus:ring-1 focus:ring-outline"
-              ref={inputRef}
               onKeyDown={(e) => handleKeyDown(e)}
+              aria-label={`Rename ${name}`}
+              aria-describedby={fileAlreadyExists ? "rename-error" : undefined}
+              aria-invalid={fileAlreadyExists}
             />
             {fileAlreadyExists && (
-              <div className="absolute top-full text-xs leading-snug bg-red-600 border border-red-700 translate-y w-full p-0.5 rounded-xs">
-                <span>
+              <div
+                className="absolute top-full text-xs leading-snug bg-red-600 border border-red-700 translate-y w-full p-0.5 rounded-xs"
+                role="alert"
+              >
+                <span id="rename-error">
                   File already exists. Please choose a different file name.
                 </span>
               </div>
@@ -92,28 +98,39 @@ const File = ({
         </div>
       ) : (
         <div
-          className={`flex justify-between gap-[5px] cursor-pointer mt-[5px] pl-[18px] hover:bg-file-hover group ${activeFile === name ? "bg-file-opened" : ""}`}
+          role="button"
+          tabIndex={0}
+          aria-label={`Open ${name}`}
+          aria-current={activeFile === name ? "true" : undefined}
+          className={`flex justify-between gap-1.25 cursor-pointer mt-1.25 pl-4.5 hover:bg-file-hover group ${activeFile === name ? "bg-file-opened" : ""}`}
           onClick={() => onFileSelect(name)}
           onDoubleClick={() => handleDoubleClick(name)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") onFileSelect(name);
+          }}
         >
-          <div className="flex gap-[5px] items-center">
-            <div className="shrink-0">
+          <div className="flex gap-1.25 items-center">
+            <div className="shrink-0" aria-hidden="true">
               <InsertDriveFile />
             </div>
             <span className="text-sm font-medium truncate">{name}</span>
           </div>
-          <span
-            className="pr-[18px] opacity-0 group-hover:opacity-100"
+          <button
+            aria-label={`Delete ${name}`}
+            tabIndex={0}
+            className="pr-4.5 opacity-0 group-hover:opacity-100 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(name);
             }}
           >
-            <Trash />
-          </span>
+            <span aria-hidden="true">
+              <Trash />
+            </span>
+          </button>
         </div>
       )}
-    </>
+    </li>
   );
 };
 

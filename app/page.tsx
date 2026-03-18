@@ -11,7 +11,6 @@ export default function Home() {
   const [activeFile, setActiveFile] = useState<string | null>(null);
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
   const [tabHistory, setTabHistory] = useState<string[]>([]);
-
   const [isSideBarOpened, setisSideBarOpened] = useState(false);
 
   function handleFileSelect(name: string) {
@@ -83,10 +82,6 @@ export default function Home() {
     setFiles(files);
   }
 
-  useEffect(() => {
-    console.log("activeTabs", activeTabs);
-  }, [activeTabs]);
-
   if (!mounted) return null;
 
   return (
@@ -102,25 +97,27 @@ export default function Home() {
         onToggle={setisSideBarOpened}
       />
 
-      {activeTabs && activeTabs.length > 0 ? (
-        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0 max-lg:ml-[53px]">
-          <Tabs
-            activeTabs={activeTabs}
-            activeFile={activeFile}
-            onClose={handleCloseTab}
-            onSelect={handleFileSelect}
-          />
-          <MonacoEditor
-            value={activeFile ? files[activeFile] : ""}
-            onChange={handleMarkDownChange}
-            disabled={!activeFile}
-          />
-        </div>
-      ) : (
-        <div className="flex-1 bg-editor font-sans flex items-center justify-center">
-          change this later
-        </div>
-      )}
+      <main className="flex-1 min-w-0 max-lg:ml-13.25" aria-label="Editor">
+        {activeTabs && activeTabs.length > 0 ? (
+          <div className="text-sm leading-4.75 flex flex-col h-full bg-editor">
+            <Tabs
+              activeTabs={activeTabs}
+              activeFile={activeFile}
+              onClose={handleCloseTab}
+              onSelect={handleFileSelect}
+            />
+            <MonacoEditor
+              value={activeFile ? files[activeFile] : ""}
+              onChange={handleMarkDownChange}
+              disabled={!activeFile}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 bg-editor font-sans flex items-center justify-center h-full" role="status">
+           No file open — create or select a file from the sidebar
+          </div>
+        )}
+      </main>
     </div>
   );
 }

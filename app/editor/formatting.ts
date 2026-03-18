@@ -1,3 +1,7 @@
+/*
+ BELOW CODE IS NOT BEING USED IN THE APPLICATION. 
+ BUT I DON'T WANT TO DELETE THE FOLDER BECAUSE I SPENT SO MUCH TIME TRYING TO UNDERSTAND IT AND WRITING IT
+ */
 export function formatText(text: string): string {
   if (/^#+/.test(text)) {
     return `<span class="text-outline font-semibold">${text}</span>`;

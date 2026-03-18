@@ -1,5 +1,7 @@
 import { Line } from "./types";
-
+/*
+CODE NO LONGER IN USE
+*/
 interface LineNumbersProps {
   lines: Line[];
   activeLine: number;

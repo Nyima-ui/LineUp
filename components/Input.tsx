@@ -1,4 +1,8 @@
 "use client";
+
+/*
+CODE NO LONGER IN USER
+ */
 import { useEffect, useRef, useState } from "react";
 import { formatText, detectOpenBracket } from "@/app/editor/formatting";
 import { Line } from "./types";
@@ -170,7 +174,6 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
       const cursorPosition = element ? saveCursorPosition(element) : null;
 
       if (cursorPosition === 0 && currentIndex > 0) {
-        console.log("trigger");
         e.preventDefault();
         handleBackspace(id);
         return;
@@ -237,9 +240,6 @@ const Input = ({ lines, setLines, generateId, setActiveLine }: InputProps) => {
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [lines]);
 
-  useEffect(() => {
-    // console.log(lines);
-  }, [lines]);
   return (
     <div className="pl-1 min-h-screen pb-20 flex-1" ref={containerRef}>
       {lines.map((line, idx) => (

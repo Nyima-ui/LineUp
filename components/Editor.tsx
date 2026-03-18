@@ -15,7 +15,7 @@ interface MonacoEditorProps {
   disabled: boolean;
 }
 
-const MonacoEditor = ({ value, onChange, disabled }: MonacoEditorProps) => {
+const MonacoEditor = ({ value, onChange }: MonacoEditorProps) => {
   const editorRef = useRef<MonacoType.editor.IStandaloneCodeEditor | null>(
     null,
   );

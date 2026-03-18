@@ -1,3 +1,8 @@
+/*
+ BELOW CODE IS NOT BEING USED IN THE APPLICATION. 
+ BUT I DON'T WANT TO DELETE THE FOLDER BECAUSE I SPENT SO MUCH TIME TRYING TO UNDERSTAND IT
+ */
+
 export function restoreCursorPosition(element: HTMLElement, position: number) {
   const selection = window.getSelection();
   if (!selection) return;
