@@ -29,36 +29,43 @@ const SideBar = ({
 }: SideBarProps) => {
   const [isTypingFileName, setisTypingFileName] = useState(false);
 
-  // className="w-[242px] pt-[20px] pr-[13px] pl-[10px]"
+  // className="flex items-center justify-between border-b pb-[5px] border-b-gray-400"
   return (
     <div
-      className={`bg-file-opened relative transition-all duration-100 ease-in pt-[20px] pr-[13px] pl-[10px]
+      className={`relative transition-all duration-150 linear pt-[20px] pr-[13px] pl-[10px] 
         max-lg:absolute max-lg:h-full z-10
-        ${isOpened ? "w-[242px]" : "w-[42px]"}`}
+        ${isOpened ? "w-[253px] bg-main" : "w-[48px] bg-editor border-r border-white/30"}`}
     >
       {/* header  */}
-      <div className="flex items-center justify-between border-b pb-[5px] border-b-gray-400">
+      <div
+        className={`flex items-center justify-between pb-[5px] border-b-gray-400 mt-[7px] ${isOpened ? "border-b" : ""}`}
+      >
         {isOpened && (
-          <div className="flex items-center gap-0.5">
-            <button className="cursor-pointer">
-              <ChevronRight />
-            </button>
-            <p className="uppercase font-bold text-sm tracking-wider">
+          <div className="flex items-center gap-[5px]">
+            <span>
+              <ArrowDown />
+            </span>
+            <p className="uppercase font-bold text-sm tracking-wider whitespace-nowrap">
               Your lists
             </p>
           </div>
         )}
-        {isOpened && (
+        <div className="flex gap-1">
+          {isOpened && (
+            <button
+              className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+              onClick={() => setisTypingFileName(true)}
+            >
+              <NoteAdd />
+            </button>
+          )}
           <button
             className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
-            onClick={() => setisTypingFileName(true)}
+            onClick={() => onToggle(!isOpened)}
           >
-            <NoteAdd />
+            <SidebarToggle />
           </button>
-        )}
-        <button className="cursor-pointer" onClick={() => onToggle(!isOpened)}>
-          <Bars />
-        </button>
+        </div>
       </div>
 
       <div
@@ -93,6 +100,8 @@ export default SideBar;
 
 import InsertDriveFile from "./svgs/InsertDriveFile";
 import { useEffect, useRef, useState } from "react";
+import SidebarToggle from "./svgs/SidebarToggle";
+import ArrowDown from "./svgs/ArrowDown";
 
 export interface FileNameInputProps {
   isTyping: boolean;
