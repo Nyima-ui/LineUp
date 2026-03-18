@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SideBar from "@/components/SideBar";
 import MonacoEditor from "@/components/Editor";
 import { type FileStore, loadFiles, saveFiles } from "@/lib/storage";
@@ -12,6 +12,8 @@ export default function Home() {
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
   const [tabHistory, setTabHistory] = useState<string[]>([]);
   const [isSideBarOpened, setisSideBarOpened] = useState(false);
+  const [unSavedFiles, setUnSavedFiles] = useState<Set<string>>(new Set());
+  const onSaveRef = useRef<() => void>(() => {});
 
   function handleFileSelect(name: string) {
     setActiveFile(name);
@@ -44,11 +46,8 @@ export default function Home() {
 
   function handleMarkDownChange(value: string) {
     if (!activeFile) return;
-    setFiles((prev) => {
-      const updated = { ...prev, [activeFile]: value };
-      saveFiles(updated);
-      return updated;
-    });
+    setFiles((prev) => ({ ...prev, [activeFile]: value }));
+    setUnSavedFiles((prev) => new Set(prev).add(activeFile));
   }
 
   useEffect(() => {
@@ -62,6 +61,40 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    onSaveRef.current = () => {
+      if (!activeFile) return;
+      saveFiles(files);
+      setUnSavedFiles((prev) => {
+        const next = new Set(prev);
+        next.delete(activeFile);
+        return next;
+      });
+    };
+  }, [activeFile, files]);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        onSaveRef.current?.();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (unSavedFiles.size > 0) {
+        e.preventDefault();
+      }
+    }
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [unSavedFiles]);
+
   function handleRename(oldName: string, newName: string) {
     setFiles((prev) => {
       const updated: FileStore = {};
@@ -72,6 +105,9 @@ export default function Home() {
       return updated;
     });
     if (activeFile === oldName) setActiveFile(newName);
+
+    setActiveTabs((prev) => prev.map((t) => (t === oldName ? newName : t)));
+    setTabHistory((prev) => prev.map((t) => (t === oldName ? newName : t)));
   }
 
   function handleDelete(name: string) {
@@ -95,6 +131,7 @@ export default function Home() {
         onDelete={handleDelete}
         isOpened={isSideBarOpened}
         onToggle={setisSideBarOpened}
+        unSavedFiles={unSavedFiles}
       />
 
       <main className="flex-1 min-w-0 max-lg:ml-13.25" aria-label="Editor">
@@ -105,16 +142,21 @@ export default function Home() {
               activeFile={activeFile}
               onClose={handleCloseTab}
               onSelect={handleFileSelect}
+              unSavedFiles={unSavedFiles}
             />
             <MonacoEditor
               value={activeFile ? files[activeFile] : ""}
               onChange={handleMarkDownChange}
               disabled={!activeFile}
+              onSaveRef={onSaveRef}
             />
           </div>
         ) : (
-          <div className="flex-1 bg-editor font-sans flex items-center justify-center h-full" role="status">
-           No file open — create or select a file from the sidebar
+          <div
+            className="flex-1 bg-editor font-sans flex items-center justify-center h-full"
+            role="status"
+          >
+            No file open — create or select a file from the sidebar
           </div>
         )}
       </main>

@@ -15,6 +15,7 @@ interface SideBarProps {
   onRename: (oldName: string, newName: string) => void;
   onDelete: (name: string) => void;
   isOpened: boolean;
+  unSavedFiles: Set<string>;
   onToggle: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -22,6 +23,7 @@ const SideBar = ({
   files,
   activeFile,
   isOpened,
+  unSavedFiles,
   onFileSelect,
   onFileCreate,
   onRename,
@@ -105,6 +107,7 @@ const SideBar = ({
                   activeFile={activeFile}
                   onRename={onRename}
                   onDelete={onDelete}
+                  unSavedFiles={unSavedFiles}
                 />
               ))}
             </ul>

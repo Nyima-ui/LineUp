@@ -7,6 +7,7 @@ import Trash from "./svgs/Trash";
 interface FileProps {
   name: string;
   activeFile: string | null;
+  unSavedFiles: Set<string>;
   onFileSelect: (name: string) => void;
   onRename: (oldName: string, newName: string) => void;
   onDelete: (name: string) => void;
@@ -15,6 +16,7 @@ interface FileProps {
 const File = ({
   name,
   activeFile,
+  unSavedFiles,
   onFileSelect,
   onRename,
   onDelete,
@@ -102,19 +104,24 @@ const File = ({
           tabIndex={0}
           aria-label={`Open ${name}`}
           aria-current={activeFile === name ? "true" : undefined}
-          className={`flex justify-between gap-1.25 cursor-pointer mt-1.25 pl-4.5 hover:bg-file-hover group ${activeFile === name ? "bg-file-opened" : ""}`}
+          className={`flex justify-between items-center gap-1.25 cursor-pointer mt-1.25 pl-4.5 hover:bg-file-hover group relative ${activeFile === name ? "bg-file-opened" : ""}`}
           onClick={() => onFileSelect(name)}
           onDoubleClick={() => handleDoubleClick(name)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") onFileSelect(name);
           }}
         >
-          <div className="flex gap-1.25 items-center">
+          <div className="flex gap-1.25 items-center min-w-0">
             <div className="shrink-0" aria-hidden="true">
               <InsertDriveFile />
             </div>
             <span className="text-sm font-medium truncate">{name}</span>
           </div>
+
+          {unSavedFiles.has(name) && (
+            <span className="size-2 rounded-full bg-outline/70 absolute right-12"></span>
+          )}
+
           <button
             aria-label={`Delete ${name}`}
             tabIndex={0}

@@ -13,9 +13,10 @@ interface MonacoEditorProps {
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
+  onSaveRef: React.RefObject<() => void>;
 }
 
-const MonacoEditor = ({ value, onChange }: MonacoEditorProps) => {
+const MonacoEditor = ({ value, onChange, onSaveRef }: MonacoEditorProps) => {
   const editorRef = useRef<MonacoType.editor.IStandaloneCodeEditor | null>(
     null,
   );
@@ -89,6 +90,10 @@ const MonacoEditor = ({ value, onChange }: MonacoEditorProps) => {
     });
 
     monaco.editor.setTheme("my-markdown-theme");
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      onSaveRef.current?.();
+    });
 
     // Apply on initial value
     applyBracketDecorations(editor, monaco, value);
