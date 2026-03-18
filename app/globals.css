@@ -3,7 +3,9 @@
 .bracket-orange {
   color: #ce9178 !important;
 }
-
+.mtk8{
+  font-weight: bold;
+}
 :root {
   --bg-main: #181818;
   --bg-editor: #212121;

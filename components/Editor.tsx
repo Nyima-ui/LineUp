@@ -82,6 +82,8 @@ const MonacoEditor = ({ value, onChange, onSaveRef }: MonacoEditorProps) => {
       rules: [
         { token: "string.link.md", foreground: "FFFFFF" },
         { token: "delimiter.square.markdown", foreground: "FFFFFF" },
+        { token: "markup.heading", fontStyle: "bold" }
+  // { token: "keyword.md", fontStyle: "bold" },  
       ],
       colors: {
         "editor.foreground": "#D4D4D4",
