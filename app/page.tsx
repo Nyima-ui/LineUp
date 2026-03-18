@@ -103,7 +103,7 @@ export default function Home() {
       />
 
       {activeTabs && activeTabs.length > 0 ? (
-        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0 max-lg:ml-[42px]">
+        <div className="text-sm leading-4.75 flex-1 bg-editor min-w-0 max-lg:ml-[53px]">
           <Tabs
             activeTabs={activeTabs}
             activeFile={activeFile}

@@ -1,10 +1,8 @@
 "use client";
 
 import File from "./File";
-import ChevronRight from "./svgs/ChevronRight";
 import NoteAdd from "./svgs/NoteAdd";
 import { loadFiles } from "@/lib/storage";
-import Bars from "./svgs/Bars";
 
 interface SideBarProps {
   files: string[];
@@ -31,65 +29,83 @@ const SideBar = ({
 
   // className="flex items-center justify-between border-b pb-[5px] border-b-gray-400"
   return (
-    <div
-      className={`relative transition-all duration-150 linear pt-[20px] pr-[13px] pl-[10px] 
-        max-lg:absolute max-lg:h-full z-10
-        ${isOpened ? "w-[253px] bg-main" : "w-[48px] bg-editor border-r border-white/30"}`}
-    >
-      {/* header  */}
+    <>
       <div
-        className={`flex items-center justify-between pb-[5px] border-b-gray-400 mt-[7px] ${isOpened ? "border-b" : ""}`}
-      >
-        {isOpened && (
-          <div className="flex items-center gap-[5px]">
-            <span>
-              <ArrowDown />
-            </span>
-            <p className="uppercase font-bold text-sm tracking-wider whitespace-nowrap">
-              Your lists
-            </p>
-          </div>
-        )}
-        <div className="flex gap-1">
-          {isOpened && (
-            <button
-              className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
-              onClick={() => setisTypingFileName(true)}
-            >
-              <NoteAdd />
-            </button>
-          )}
-          <button
-            className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
-            onClick={() => onToggle(!isOpened)}
-          >
-            <SidebarToggle />
-          </button>
-        </div>
-      </div>
+        className={`fixed inset-0 bg-black/40 z-10 lg:hidden transition-opacity duration-200 ${isOpened ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={() => onToggle(false)}
+      />
 
       <div
-        className={`mt-5 text-white whitespace-nowrap transition-opacity duration-100 ease-in ${isOpened ? "opacity-100" : "opacity-0"}`}
+        className={`relative shrink-0 transition-all duration-200 ease-in-out 
+        ${isOpened ? "w-[253px]" : "w-[48px]"}
+        max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:h-full max-lg:w-auto max-lg:z-20`}
       >
-        {files.map((name, idx) => (
-          <File
-            key={idx}
-            name={name}
-            onFileSelect={onFileSelect}
-            activeFile={activeFile}
-            onRename={onRename}
-            onDelete={onDelete}
-          />
-        ))}
+        {!isOpened && (
+          <div className="flex flex-col items-center pt-[24px] px-[10px] ">
+            <button
+              className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+              onClick={() => onToggle(true)}
+            >
+              <SidebarToggle />
+            </button>
+          </div>
+        )}
+
+        <div
+          className={`absolute top-0 left-0 h-full w-[253px] bg-main transition-transform duration-200 ease-in-out ${isOpened ? "translate-x-0" : "-translate-x-full"}`}
+        >
+          <div className="pt-[20px] pr-[13px] pl-[10px] h-full flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-[5px] border-b border-b-gray-400 mt-[7px]">
+              <div className="flex items-center gap-[5px]">
+                <ArrowDown />
+                <p className="uppercase font-bold text-sm tracking-wider whitespace-nowrap">
+                  Your lists
+                </p>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+                  onClick={() => setisTypingFileName(true)}
+                >
+                  <NoteAdd />
+                </button>
+                <button
+                  className="cursor-pointer hover:bg-file-hover p-1 rounded-sm"
+                  onClick={() => onToggle(false)}
+                >
+                  <SidebarToggle />
+                </button>
+              </div>
+            </div>
+
+            {/* file list  */}
+            <div
+              className={`mt-5 text-white overflow-y-auto transition-opacity duration-150 ease-in ${isOpened ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            >
+              {files.map((name, idx) => (
+                <File
+                  key={idx}
+                  name={name}
+                  onFileSelect={onFileSelect}
+                  activeFile={activeFile}
+                  onRename={onRename}
+                  onDelete={onDelete}
+                />
+              ))}
+            </div>
+
+            {isTypingFileName && (
+              <FileNameInput
+                isTyping={isTypingFileName}
+                setIsTyping={setisTypingFileName}
+                createFile={onFileCreate}
+              />
+            )}
+          </div>
+        </div>
       </div>
-      {isTypingFileName && (
-        <FileNameInput
-          isTyping={isTypingFileName}
-          setIsTyping={setisTypingFileName}
-          createFile={onFileCreate}
-        />
-      )}
-    </div>
+    </>
   );
 };
 
@@ -109,7 +125,7 @@ export interface FileNameInputProps {
   createFile: (value: string) => void;
 }
 
-function FileNameInput({
+export function FileNameInput({
   isTyping,
   setIsTyping,
   createFile,

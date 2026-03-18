@@ -24,3 +24,19 @@
   --color-foreground: var(--foreground);
   --color-outline-line: var(--color-outline-line);
 }
+
+
+.custom-scrollbar::-webkit-scrollbar{
+  height: 3px;
+  width: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-track{
+  background: var(--bg-main)
+}
+.custom-scrollbar::-webkit-scrollbar-thumb{
+  background: var(--bg-file-opened);
+  border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover{
+  background: #6a6a6a;
+}
