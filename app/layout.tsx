@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Lineup",
-  description: "Your daily lineup of tasks and lists.",
+  description: "Lineup is a lightweight task and file manager for organizing your daily notes, lists, and to-dos — all in one place.",
 };
 
 export default function RootLayout({

@@ -135,6 +135,7 @@ export default function Home() {
       .join("\n");
 
     setFiles((prev) => ({ ...prev, [activeFile]: sequencedList }));
+    if (list === sequencedList) return;
     setUnSavedFiles((prev) => new Set(prev).add(activeFile));
   }
 
@@ -178,7 +179,9 @@ export default function Home() {
             role="status"
           >
             <div className="flex justify-center items-center flex-col">
-              <h1 className="font-mono max-md:px-5 max-md:text-center">No file open — create or select a file from the sidebar</h1>
+              <h1 className="font-mono max-md:px-5 max-md:text-center">
+                No file open — create or select a file from the sidebar
+              </h1>
               <Image height={325} width={325} src="/logo.svg" alt="Logo" />
             </div>
           </div>

@@ -24,10 +24,10 @@ const Tabs = ({
     <div
       role="tablist"
       aria-label="Open files"
-      className="flex items-end justify-between bg-main border-b-gray-700 borde h-14.75 pt-2 overflow-x-scroll custom-scrollbar relative"
+      className="flex items-end justify-between bg-main border-b-gray-700 borde h-14.75 pt-2  relative"
     >
       {/* tab  */}
-      <div className="flex pr-13">
+      <div className="flex pr-40 custom-scrollbar overflow-x-scroll">
         {activeTabs?.map((name, idx) => {
           const isActive = activeFile === name;
           return (
@@ -74,22 +74,24 @@ const Tabs = ({
         })}
       </div>
 
-      <button
-        className="cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          onSequence();
-        }}
-      >
-        Renumber
-      </button>
-      <Link
-        href="https://github.com/Nyima-ui/LineUp"
-        target="_blank"
-        className="cursor-pointer"
-      >
-        <Image height={28} width={28} src="/github.svg" alt="Github" />
-      </Link>
+      <div className="flex gap-5 px-5 absolute top-4 right-0 bg-editor py-1">
+        <button
+          className="cursor-pointer font-mono hover:underline"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSequence();
+          }}
+        >
+          Renumber
+        </button>
+        <Link
+          href="https://github.com/Nyima-ui/LineUp"
+          target="_blank"
+          className="cursor-pointer shrink-0"
+        >
+          <Image height={28} width={28} src="/github.svg" alt="Github" />
+        </Link>
+      </div>
     </div>
   );
 };
