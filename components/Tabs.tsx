@@ -9,6 +9,7 @@ interface TabsProps {
   unSavedFiles: Set<string>;
   onClose: (name: string) => void;
   onSelect: (name: string) => void;
+  onSequence: () => void;
 }
 
 const Tabs = ({
@@ -17,6 +18,7 @@ const Tabs = ({
   unSavedFiles,
   onClose,
   onSelect,
+  onSequence,
 }: TabsProps) => {
   return (
     <div
@@ -72,10 +74,19 @@ const Tabs = ({
         })}
       </div>
 
+      <button
+        className="cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSequence();
+        }}
+      >
+        Renumber
+      </button>
       <Link
         href="https://github.com/Nyima-ui/LineUp"
         target="_blank"
-        className="cursor-pointer fixed right-5 top-5 z-20"
+        className="cursor-pointer"
       >
         <Image height={28} width={28} src="/github.svg" alt="Github" />
       </Link>

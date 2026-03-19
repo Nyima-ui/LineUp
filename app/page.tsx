@@ -4,6 +4,7 @@ import SideBar from "@/components/SideBar";
 import MonacoEditor from "@/components/Editor";
 import { type FileStore, loadFiles, saveFiles } from "@/lib/storage";
 import Tabs from "@/components/Tabs";
+import Image from "next/image";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -118,6 +119,25 @@ export default function Home() {
     setFiles(files);
   }
 
+  function autoNumber() {
+    if (!activeFile) return;
+    let counter = 1;
+    const list = files[activeFile];
+
+    const sequencedList = list
+      .split("\n")
+      .map((line) => {
+        if (/^\d+\./.test(line)) {
+          return line.replace(/^\d+\./, `${counter++}.`);
+        }
+        return line;
+      })
+      .join("\n");
+
+    setFiles((prev) => ({ ...prev, [activeFile]: sequencedList }));
+    setUnSavedFiles((prev) => new Set(prev).add(activeFile));
+  }
+
   if (!mounted) return null;
 
   return (
@@ -143,6 +163,7 @@ export default function Home() {
               onClose={handleCloseTab}
               onSelect={handleFileSelect}
               unSavedFiles={unSavedFiles}
+              onSequence={autoNumber}
             />
             <MonacoEditor
               value={activeFile ? files[activeFile] : ""}
@@ -156,7 +177,10 @@ export default function Home() {
             className="flex-1 bg-editor font-sans flex items-center justify-center h-full"
             role="status"
           >
-            No file open — create or select a file from the sidebar
+            <div className="flex justify-center items-center flex-col">
+              <h1 className="font-mono max-md:px-5 max-md:text-center">No file open — create or select a file from the sidebar</h1>
+              <Image height={325} width={325} src="/logo.svg" alt="Logo" />
+            </div>
           </div>
         )}
       </main>
